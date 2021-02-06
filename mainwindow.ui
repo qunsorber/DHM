@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>978</width>
+    <height>744</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>DHM</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <layout class="QGridLayout" name="gridLayout" rowstretch="1,1" columnstretch="1,2,2">
+    <property name="leftMargin">
+     <number>3</number>
+    </property>
+    <property name="topMargin">
+     <number>3</number>
+    </property>
+    <property name="rightMargin">
+     <number>3</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
+    <item row="0" column="2">
+     <widget class="QFrame" name="data3Dpreview">
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="8,1">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelColorBar">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QFrame" name="verticalFrame">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255);</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QChartView" name="gViewLine"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QGraphicsView" name="gViewCamera">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" rowspan="2">
+     <widget class="QTextBrowser" name="textBrowserParam"/>
+    </item>
+    <item row="1" column="1">
+     <widget class="QGraphicsView" name="gViewCompute"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>978</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>文件</string>
+    </property>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuMode">
+    <property name="title">
+     <string>模式</string>
+    </property>
+    <widget class="QMenu" name="menuCamera">
+     <property name="title">
+      <string>摄像头</string>
+     </property>
+     <addaction name="actionbasler"/>
+     <addaction name="actionzidai"/>
+    </widget>
+    <widget class="QMenu" name="menuModeFile">
+     <property name="title">
+      <string>文件</string>
+     </property>
+     <addaction name="actionPicture"/>
+     <addaction name="actionVideo"/>
+    </widget>
+    <addaction name="menuCamera"/>
+    <addaction name="menuModeFile"/>
+   </widget>
+   <widget class="QMenu" name="menuSetting">
+    <property name="title">
+     <string>设置</string>
+    </property>
+    <addaction name="actionParm"/>
+    <addaction name="actionCalib"/>
+    <addaction name="actionPhaseCompute"/>
+   </widget>
+   <widget class="QMenu" name="menuDisplay">
+    <property name="title">
+     <string>显示</string>
+    </property>
+    <addaction name="action2Dpreview"/>
+    <addaction name="action3Dpreview"/>
+   </widget>
+   <widget class="QMenu" name="menuSelect">
+    <property name="title">
+     <string>选择</string>
+    </property>
+    <addaction name="actionRect"/>
+    <addaction name="actionLine"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>帮助</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuMode"/>
+   <addaction name="menuSetting"/>
+   <addaction name="menuDisplay"/>
+   <addaction name="menuSelect"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionbasler">
+   <property name="text">
+    <string>basler</string>
+   </property>
+  </action>
+  <action name="actionzidai">
+   <property name="text">
+    <string>usb</string>
+   </property>
+  </action>
+  <action name="actionPicture">
+   <property name="text">
+    <string>picture</string>
+   </property>
+  </action>
+  <action name="actionVideo">
+   <property name="text">
+    <string>video</string>
+   </property>
+  </action>
+  <action name="actionCalib">
+   <property name="text">
+    <string>系统校正</string>
+   </property>
+  </action>
+  <action name="actionPhaseCompute">
+   <property name="text">
+    <string>相位计算</string>
+   </property>
+  </action>
+  <action name="action2Dpreview">
+   <property name="text">
+    <string>2D预览</string>
+   </property>
+  </action>
+  <action name="action3Dpreview">
+   <property name="text">
+    <string>3D预览</string>
+   </property>
+  </action>
+  <action name="actionRect">
+   <property name="text">
+    <string>区域选择</string>
+   </property>
+  </action>
+  <action name="actionLine">
+   <property name="text">
+    <string>线段选择</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>退出</string>
+   </property>
+  </action>
+  <action name="actionParm">
+   <property name="text">
+    <string>参数设置</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header>qchartview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
