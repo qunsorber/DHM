@@ -8,7 +8,7 @@ ParamSet::ParamSet(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->btnOk,&QPushButton::clicked,this,&ParamSet::okSet);
     connect(ui->btnCancel,&QPushButton::clicked,this,&ParamSet::close);
-    //默认设置
+    //默认设置test
     ui->radioRelief->setChecked(true);
     ui->radioTestYes->setChecked(true);
     ui->radioReverseNo->setChecked(true);
