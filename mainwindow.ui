@@ -81,7 +81,7 @@
      </widget>
     </item>
     <item row="0" column="1">
-     <widget class="QGraphicsView" name="gViewCamera">
+     <widget class="MyGraphicsView" name="gViewCamera">
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
@@ -94,7 +94,7 @@
      <widget class="QTextBrowser" name="textBrowserParam"/>
     </item>
     <item row="1" column="1">
-     <widget class="QGraphicsView" name="gViewCompute"/>
+     <widget class="MyGraphicsView" name="gViewCompute"/>
     </item>
    </layout>
   </widget>
@@ -244,6 +244,11 @@
    <class>QChartView</class>
    <extends>QGraphicsView</extends>
    <header>qchartview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>mygraphicsview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

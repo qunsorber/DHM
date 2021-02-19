@@ -41,17 +41,21 @@ LIBS += \
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    paramset.cpp
+        paramset.cpp \
+        mygraphicsview.cpp \
+        mygraphicsscene.cpp
 
 HEADERS += \
         mainwindow.h \
-    TransDHMDll.h \
-    paramset.h
+        TransDHMDll.h \
+        paramset.h \
+        mygraphicsview.h \
+        mygraphicsscene.h
 
 FORMS += \
         mainwindow.ui \
-    paramset.ui
+        paramset.ui
 
 RESOURCES += \
-    res.qrc
+        res.qrc
 

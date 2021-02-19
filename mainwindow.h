@@ -24,6 +24,8 @@
 #include <QThread>
 #include <QMutex>
 #include "paramset.h"
+#include "mygraphicsscene.h"
+#include "mygraphicsview.h"
 
 #pragma comment(lib,"D:\\QtProjects\\20210120\\camera3d\\TransDHMDll.lib")
 
@@ -67,7 +69,7 @@ private slots:
     void cleanAllDisplay();
     void zoomIn();
     void zoomOut();
-    bool eventFilter(QObject* watched, QEvent* event);
+//    bool eventFilter(QObject* watched, QEvent* event);
     void getParam();
 
 private:
@@ -92,6 +94,7 @@ private:
     int outWidth;
     int outHeight;
     float m_max,m_min;
+    MyGraphicsScene *myHoloScene;
     //相位显示
 //    QGraphicsScene *myPhaseScene;
     //3D图表
@@ -136,7 +139,7 @@ public:
     QPoint toDrawPoint(QPoint pSrc);//鼠标点击坐标到画线/画框坐标的转换函数
     void scaleImage(float factor);
 public:
-    void mousePressEvent(QMouseEvent *ev);
+//    void mousePressEvent(QMouseEvent *ev);
 
 };
 

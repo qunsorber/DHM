@@ -1,6 +1,7 @@
+#include <QtMath>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QtMath>
+
 
 using namespace cv;
 
@@ -68,12 +69,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //全息图，相位图实现滚轴放大缩小
     //对QGraphcisView控件注册事件响应
-    ui->gViewCompute->installEventFilter(this);
+//    ui->gViewCompute->installEventFilter(this);
     //使能QGraphcisView控件的鼠标跟踪
-    ui->gViewCompute->setMouseTracking(true);
+//    ui->gViewCompute->setMouseTracking(true);
 
+    //全息图场景对象
+    myHoloScene = new MyGraphicsScene();
+    connect(ui->gViewCamera,&MyGraphicsView::drawImage,myHoloScene,&MyGraphicsScene::onDrawImage);
     //相位场景对象
-//    myPhaseScene = new QGraphicsScene();
+//    myPhaseScene = new MyGraphicsScene();
     lineItem = new QGraphicsLineItem();
     rectItem = new QGraphicsRectItem();
     //参数设置
@@ -174,9 +178,9 @@ void MainWindow::displayHologram()
             QImage Qtemp = QImage((unsigned char*)grayImg.data,
                                   grayImg.cols,grayImg.rows,
                                   QImage::Format_Indexed8);
-            QGraphicsScene *myScene = new QGraphicsScene();
-            myScene->addPixmap(QPixmap::fromImage(Qtemp).scaled(mSizeDefault));
-            ui->gViewCamera->setScene(myScene);
+//            QGraphicsScene *myScene = new QGraphicsScene();
+            myHoloScene->addPixmap(QPixmap::fromImage(Qtemp).scaled(mSizeDefault));
+            ui->gViewCamera->setScene(myHoloScene);
             //QThread::msleep(2000);
         }
     }
@@ -413,92 +417,96 @@ void MainWindow::createColorBar(float max,float min)
     ui->labelColorBar->setPixmap(pm);
 }
 
-void MainWindow::mousePressEvent(QMouseEvent *ev)
-{
-    if (ev->button() == Qt::LeftButton){
-        int x = ev->x();
-        int y = ev->y();
-//        qDebug() <<"x:"<< ui->gViewCompute->x() << "--ex:" << x << "--centerx:"<< centralWidget()->x();
-//        qDebug() <<"y:"<< ui->gViewCompute->y() << "--ey:" << y << "--centery:"<< centralWidget()->y();
-        //如果不在指定的区域选区域或者选直线，将不保存本次点击坐标，鼠标点击的纵坐标包括标题栏、菜单栏和工具栏的高度，因此需减去
-        if (x < ui->gViewCompute->pos().x()
-               || x > ui->gViewCompute->pos().x() + ui->gViewCompute->size().width()
-               || y - centralWidget()->y() < ui->gViewCompute->pos().y()
-               || y - centralWidget()->y() > ui->gViewCompute->pos().y() + ui->gViewCompute->size().height())
-            return;
-        if (mRectClick==0){
-            mSelectRect.setTopLeft(QPoint(x, y - centralWidget()->y()));//保存的坐标以去除菜单栏工具栏后的窗口为原点
-            mRectClick++;
-//            qDebug () << "x:" << x << "--y:" << y;
-        }
-        else if(mRectClick==1){
-            mSelectRect.setBottomRight(QPoint(x, y - centralWidget()->y()));
-            mRectClick++;
-//            qDebug () << "x:" << x << "--y:" << y;
-            this->setCursor(Qt::ArrowCursor);
-            QPoint pDrawStart = toDrawPoint(mSelectRect.topLeft());
-            QPoint pDrawEnd = toDrawPoint(mSelectRect.bottomRight());
+//void MainWindow::mousePressEvent(QMouseEvent *ev)
+//{
+//    if (ev->button() == Qt::LeftButton){
+//        int x = ev->x();
+//        int y = ev->y();
+////        qDebug() <<"x:"<< ui->gViewCompute->x() << "--ex:" << x << "--centerx:"<< centralWidget()->x();
+////        qDebug() <<"y:"<< ui->gViewCompute->y() << "--ey:" << y << "--centery:"<< centralWidget()->y();
+//        //如果不在指定的区域选区域或者选直线，将不保存本次点击坐标，鼠标点击的纵坐标包括标题栏、菜单栏和工具栏的高度，因此需减去
+//        if (x < ui->gViewCompute->pos().x()
+//               || x > ui->gViewCompute->pos().x() + ui->gViewCompute->size().width()
+//               || y - centralWidget()->y() < ui->gViewCompute->pos().y()
+//               || y - centralWidget()->y() > ui->gViewCompute->pos().y() + ui->gViewCompute->size().height())
+//            return;
+//        if (mRectClick==0){
+//            mSelectRect.setTopLeft(QPoint(x, y - centralWidget()->y()));//保存的坐标以去除菜单栏工具栏后的窗口为原点
+//            mRectClick++;
+////            qDebug () << "x:" << x << "--y:" << y;
+//        }
+//        else if(mRectClick==1){
+//            mSelectRect.setBottomRight(QPoint(x, y - centralWidget()->y()));
+//            mRectClick++;
+////            qDebug () << "x:" << x << "--y:" << y;
+//            this->setCursor(Qt::ArrowCursor);
+//            QPoint pDrawStart = toDrawPoint(mSelectRect.topLeft());
+//            QPoint pDrawEnd = toDrawPoint(mSelectRect.bottomRight());
 
-            QPen pen;
-            pen.setWidth(2);
-            pen.setColor(Qt::red);
-            rectItem = ui->gViewCompute->scene()->addRect(QRect(pDrawStart,pDrawEnd),pen);
-            mRectNum++;
-            mCropRect.setTopLeft(convPoint(mSelectRect.topLeft()));
-            mCropRect.setBottomRight(convPoint(mSelectRect.bottomRight()));
-        }
-        else if(mLineClick==0){
-            pStart.setX(x);
-            pStart.setY(y - centralWidget()->y());
-            mLineClick++;
-        }
-        else if(mLineClick==1){
-            pEnd.setX(x);
-            pEnd.setY(y - centralWidget()->y());
-            mLineClick++;
-            this->setCursor(Qt::ArrowCursor);
-            QPoint pDrawStart = toDrawPoint(pStart);
-            QPoint pDrawEnd = toDrawPoint(pEnd);
-            QPen pen;
-            pen.setWidth(2);
-            pen.setColor(Qt::red);
-            lineItem = ui->gViewCompute->scene()->addLine(QLine(pDrawStart,pDrawEnd),pen);
-            mLineNum++;
-            pStart = convPoint(pStart);
-            pEnd = convPoint(pEnd);
-            if(ui->actionPicture->isChecked())
-                displayChart();
-            else if(ui->actionVideo->isChecked())
-                timerChart->start();
-        }
-    }
-}
+//            QPen pen;
+//            pen.setWidth(2);
+//            pen.setColor(Qt::red);
+//            rectItem = ui->gViewCompute->scene()->addRect(QRect(pDrawStart,pDrawEnd),pen);
+//            mRectNum++;
+//            mCropRect.setTopLeft(convPoint(mSelectRect.topLeft()));
+//            mCropRect.setBottomRight(convPoint(mSelectRect.bottomRight()));
+//        }
+//        else if(mLineClick==0){
+//            pStart.setX(x);
+//            pStart.setY(y - centralWidget()->y());
+//            mLineClick++;
+//        }
+//        else if(mLineClick==1){
+//            pEnd.setX(x);
+//            pEnd.setY(y - centralWidget()->y());
+//            mLineClick++;
+//            this->setCursor(Qt::ArrowCursor);
+//            QPoint pDrawStart = toDrawPoint(pStart);
+//            QPoint pDrawEnd = toDrawPoint(pEnd);
+//            QPen pen;
+//            pen.setWidth(2);
+//            pen.setColor(Qt::red);
+//            lineItem = ui->gViewCompute->scene()->addLine(QLine(pDrawStart,pDrawEnd),pen);
+//            mLineNum++;
+//            pStart = convPoint(pStart);
+//            pEnd = convPoint(pEnd);
+//            if(ui->actionPicture->isChecked())
+//                displayChart();
+//            else if(ui->actionVideo->isChecked())
+//                timerChart->start();
+//        }
+//    }
+//}
 
 void MainWindow::getRectData()
 {
-    this->setCursor(Qt::CrossCursor);
-//    initGraph3D();
-    mRectClick = 0;
-    if(mRectNum){
-        ui->gViewCompute->scene()->removeItem(rectItem);
-        mRectNum--;
-    }
+//    this->setCursor(Qt::CrossCursor);
+////    initGraph3D();
+//    mRectClick = 0;
+//    if(mRectNum){
+//        ui->gViewCompute->scene()->removeItem(rectItem);
+//        mRectNum--;
+//    }
+    ui->gViewCamera->setState(MyGraphicsView::S_Begin);
+    ui->gViewCamera->setType(MyGraphicsView::T_Rect);
 }
 
 void MainWindow::getLineData()
 {
-    this->setCursor(Qt::CrossCursor);
-    initChart();
-    if(mLineClick==-1&&ui->actionVideo->isChecked()){
-        timerChart = new QTimer;
-        timerChart->setInterval(500);
-        connect(timerChart,&QTimer::timeout,this,&MainWindow::displayChart);
-    }
-    mLineClick = 0;
-    if(mLineNum){
-        ui->gViewCompute->scene()->removeItem(lineItem);
-        mLineNum--;
-    }
+//    this->setCursor(Qt::CrossCursor);
+//    initChart();
+//    if(mLineClick==-1&&ui->actionVideo->isChecked()){
+//        timerChart = new QTimer;
+//        timerChart->setInterval(500);
+//        connect(timerChart,&QTimer::timeout,this,&MainWindow::displayChart);
+//    }
+//    mLineClick = 0;
+//    if(mLineNum){
+//        ui->gViewCompute->scene()->removeItem(lineItem);
+//        mLineNum--;
+//    }
+    ui->gViewCamera->setState(MyGraphicsView::S_Begin);
+    ui->gViewCamera->setType(MyGraphicsView::T_Line);
 }
 
 void MainWindow::initChart()
@@ -668,48 +676,48 @@ void MainWindow::zoomOut()
     scaleImage(0.8f);
 }
 
-bool MainWindow::eventFilter(QObject* watched, QEvent* event)
-{
-    //如果信号不是来自于QGraphicsView，返回。
-    if (watched != ui->gViewCompute)
-        return false;
+//bool MainWindow::eventFilter(QObject* watched, QEvent* event)
+//{
+//    //如果信号不是来自于QGraphicsView，返回。
+//    if (watched != ui->gViewCompute)
+//        return false;
 
-    switch (event->type())
-    {
-    //按键事件（操作放缩）
-    case QEvent::KeyPress:
-    {
-        QKeyEvent * kEvent = (QKeyEvent*)event;
-        //‘+’即键盘中的‘=’，执行放大
-        if (kEvent->key() == '=')
-        {
-            scaleImage(1.2f);
-        }
-        //‘-’执行缩小
-        else if (kEvent->key() == '-')
-        {
-            scaleImage(0.8f);
-        }
-    }
-    case QEvent::Wheel:
-    {
-        QWheelEvent *wEvent = (QWheelEvent*)event;
-        if(wEvent->delta() > 0)
-        {
-            zoomIn();
-        }
-        else
-        {
-            zoomOut();
-        }
-    }
+//    switch (event->type())
+//    {
+//    //按键事件（操作放缩）
+//    case QEvent::KeyPress:
+//    {
+//        QKeyEvent * kEvent = (QKeyEvent*)event;
+//        //‘+’即键盘中的‘=’，执行放大
+//        if (kEvent->key() == '=')
+//        {
+//            scaleImage(1.2f);
+//        }
+//        //‘-’执行缩小
+//        else if (kEvent->key() == '-')
+//        {
+//            scaleImage(0.8f);
+//        }
+//    }
+//    case QEvent::Wheel:
+//    {
+//        QWheelEvent *wEvent = (QWheelEvent*)event;
+//        if(wEvent->delta() > 0)
+//        {
+//            zoomIn();
+//        }
+//        else
+//        {
+//            zoomOut();
+//        }
+//    }
 
-    default:
-        break;
-    }
+//    default:
+//        break;
+//    }
 
-    return QMainWindow::eventFilter(watched, event);
-}
+//    return QMainWindow::eventFilter(watched, event);
+//}
 
 void MainWindow::getParam()
 {
