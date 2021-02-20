@@ -3,7 +3,7 @@
 
 MyGraphicsScene::MyGraphicsScene(QObject *parent)
     :QGraphicsScene(parent)
-    ,mCurrentItem(NULL)
+    ,mCurrentItem(NULL),mLineItem(NULL),mRectItem(NULL)
 {
 
 }
@@ -59,8 +59,8 @@ void MyGraphicsScene::endDraw(QPoint beginPos,QPoint endPos,int type)
 //        path.moveTo(beginPos);
 //        path.lineTo(endPos);
 //        mCurrentItem->setPath(path);
-
-        mCurrentItem = this->addLine(QLine(beginPos,endPos),QPen(Qt::red,2));
+        mLineItem = this->addLine(QLine(beginPos,endPos),QPen(Qt::red,2));
+        mCurrentItem = mLineItem;
     }
         break;
     case T_Rect:
@@ -68,7 +68,8 @@ void MyGraphicsScene::endDraw(QPoint beginPos,QPoint endPos,int type)
 //        QPainterPath path;
 //        path.addRect(beginPos.x(),beginPos.y(),w,h);
 //        mCurrentItem->setPath(path);
-        mCurrentItem = this->addRect(QRect(beginPos,endPos),QPen(Qt::red,2));
+        mRectItem = this->addRect(QRect(beginPos,endPos),QPen(Qt::red,2));
+        mCurrentItem = mRectItem;
     }
         break;
     default:
@@ -111,10 +112,12 @@ void MyGraphicsScene::clear(int type)
 
 void MyGraphicsScene::clearLineItems()
 {
-    clear(T_Line);
+//    clear(T_Line);
+    if(mLineItem) this->removeItem(mLineItem);
 }
 
 void MyGraphicsScene::clearRectItems()
 {
-    clear(T_Rect);
+//    clear(T_Rect);
+    if(mRectItem) this->removeItem(mRectItem);
 }

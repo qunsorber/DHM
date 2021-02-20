@@ -61,12 +61,13 @@ void MyGraphicsView::mousePressEvent(QMouseEvent *event)
             mStartPoint = QPointF(mapToScene(mStartPoint)).toPoint();
             emit drawImage(mStartPoint,mStartPoint,mType,mState);
             mState = S_Moving;
-            qDebug() << "start!";
+
         }
         else if(mState == S_Moving){
             mEndPoint = event->pos();
             //将QGraphicsView中的坐标转换为QGraphicsScene中的坐标
             mEndPoint = QPointF(mapToScene(mEndPoint)).toPoint();
+            //将鼠标点击的坐标信息发给图表显示
             switch (mType) {
             case T_Point:
                 emit drawImage(mStartPoint,mEndPoint,mType,mState);
@@ -74,12 +75,10 @@ void MyGraphicsView::mousePressEvent(QMouseEvent *event)
             case T_Line:
                 mState = S_End;
                 emit drawImage(mStartPoint,mEndPoint,mType,mState);
-                qDebug() << "line end!";
                 break;
             case T_Rect:
                 mState = S_End;
                 emit drawImage(mStartPoint,mEndPoint,mType,mState);
-                qDebug() << "rect end!";
                 break;
             default:
                 break;

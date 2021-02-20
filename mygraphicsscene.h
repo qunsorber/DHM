@@ -38,8 +38,8 @@ private:
 private:
     QList<QGraphicsItem*> mItemList;
     QGraphicsItem *mCurrentItem;
-//    QGraphicsLineItem *lineItem;
-//    QGraphicsRectItem *rectItem;
+    QGraphicsLineItem *mLineItem;
+    QGraphicsRectItem *mRectItem;
 
 public slots:
     void onDrawImage(QPoint beginPos,QPoint nextPos,int type,int state);

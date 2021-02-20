@@ -64,8 +64,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     //工具栏中的功能实现
     connect(a1,&QAction::triggered,this,&MainWindow::cleanAllDisplay);
-    connect(a4,&QAction::triggered,this,&MainWindow::zoomIn);
-    connect(a5,&QAction::triggered,this,&MainWindow::zoomOut);
+//    connect(a4,&QAction::triggered,this,&MainWindow::zoomIn);
+//    connect(a5,&QAction::triggered,this,&MainWindow::zoomOut);
 
     //全息图，相位图实现滚轴放大缩小
     //对QGraphcisView控件注册事件响应
@@ -75,11 +75,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //全息图场景对象
     myHoloScene = new MyGraphicsScene();
-    connect(ui->gViewCamera,&MyGraphicsView::drawImage,myHoloScene,&MyGraphicsScene::onDrawImage);
+//    connect(ui->gViewCompute,&MyGraphicsView::drawImage,myHoloScene,&MyGraphicsScene::onDrawImage);
     //相位场景对象
-//    myPhaseScene = new MyGraphicsScene();
-    lineItem = new QGraphicsLineItem();
-    rectItem = new QGraphicsRectItem();
+    myPhaseScene = new MyGraphicsScene();
+    connect(ui->gViewCompute,&MyGraphicsView::drawImage,myPhaseScene,&MyGraphicsScene::onDrawImage);
+    //点击线段/矩形框选择时清除已有的线段/矩形框图元对象
+    connect(ui->actionRect,&QAction::triggered,myPhaseScene,&MyGraphicsScene::clearRectItems);
+    connect(ui->actionLine,&QAction::triggered,myPhaseScene,&MyGraphicsScene::clearLineItems);
+    connect(ui->gViewCompute,&MyGraphicsView::drawImage,this,&MainWindow::onDisplayChart);
+//    lineItem = new QGraphicsLineItem();
+//    rectItem = new QGraphicsRectItem();
     //参数设置
     connect(ui->actionParm,&QAction::triggered,this,&MainWindow::getParam);
 }
@@ -267,14 +272,17 @@ void MainWindow::displayPhase()
 
     QImage Qtemp = QImage(phase42ddisplay,outWidth,outHeight,QImage::Format_Indexed8);
 //    Qtemp = Qtemp.scaled(ui->gViewCompute->width(),ui->gViewCompute->height(),Qt::IgnoreAspectRatio);
-    QGraphicsScene *myScene = new QGraphicsScene();
-//    myPhaseScene->addPixmap(QPixmap::fromImage(Qtemp).scaled(mSizeDefault));
-    myScene->addPixmap(QPixmap::fromImage(Qtemp).scaled(mSizeDefault));
-    ui->gViewCompute->setScene(myScene);
-    if(mRectNum)
-        myScene->addItem(rectItem);
-    if(mLineNum)
-        myScene->addItem(lineItem);
+//    QGraphicsScene *myScene = new QGraphicsScene();
+//    MyGraphicsScene *myPhaseScene = new MyGraphicsScene();
+//    connect(ui->gViewCompute,&MyGraphicsView::drawImage,myPhaseScene,&MyGraphicsScene::onDrawImage);
+    myPhaseScene->addPixmap(QPixmap::fromImage(Qtemp).scaled(mSizeDefault));
+    qDebug() << "myPhaseScene size:" <<myPhaseScene->items().size();
+//    myScene->addPixmap(QPixmap::fromImage(Qtemp).scaled(mSizeDefault));
+    ui->gViewCompute->setScene(myPhaseScene);
+//    if(mRectNum)
+//        myScene->addItem(rectItem);
+//    if(mLineNum)
+//        myScene->addItem(lineItem);
 //    delete hologram;
 //    delete phasedata;
 //    delete phase4display;
@@ -417,84 +425,24 @@ void MainWindow::createColorBar(float max,float min)
     ui->labelColorBar->setPixmap(pm);
 }
 
-//void MainWindow::mousePressEvent(QMouseEvent *ev)
-//{
-//    if (ev->button() == Qt::LeftButton){
-//        int x = ev->x();
-//        int y = ev->y();
-////        qDebug() <<"x:"<< ui->gViewCompute->x() << "--ex:" << x << "--centerx:"<< centralWidget()->x();
-////        qDebug() <<"y:"<< ui->gViewCompute->y() << "--ey:" << y << "--centery:"<< centralWidget()->y();
-//        //如果不在指定的区域选区域或者选直线，将不保存本次点击坐标，鼠标点击的纵坐标包括标题栏、菜单栏和工具栏的高度，因此需减去
-//        if (x < ui->gViewCompute->pos().x()
-//               || x > ui->gViewCompute->pos().x() + ui->gViewCompute->size().width()
-//               || y - centralWidget()->y() < ui->gViewCompute->pos().y()
-//               || y - centralWidget()->y() > ui->gViewCompute->pos().y() + ui->gViewCompute->size().height())
-//            return;
-//        if (mRectClick==0){
-//            mSelectRect.setTopLeft(QPoint(x, y - centralWidget()->y()));//保存的坐标以去除菜单栏工具栏后的窗口为原点
-//            mRectClick++;
-////            qDebug () << "x:" << x << "--y:" << y;
-//        }
-//        else if(mRectClick==1){
-//            mSelectRect.setBottomRight(QPoint(x, y - centralWidget()->y()));
-//            mRectClick++;
-////            qDebug () << "x:" << x << "--y:" << y;
-//            this->setCursor(Qt::ArrowCursor);
-//            QPoint pDrawStart = toDrawPoint(mSelectRect.topLeft());
-//            QPoint pDrawEnd = toDrawPoint(mSelectRect.bottomRight());
-
-//            QPen pen;
-//            pen.setWidth(2);
-//            pen.setColor(Qt::red);
-//            rectItem = ui->gViewCompute->scene()->addRect(QRect(pDrawStart,pDrawEnd),pen);
-//            mRectNum++;
-//            mCropRect.setTopLeft(convPoint(mSelectRect.topLeft()));
-//            mCropRect.setBottomRight(convPoint(mSelectRect.bottomRight()));
-//        }
-//        else if(mLineClick==0){
-//            pStart.setX(x);
-//            pStart.setY(y - centralWidget()->y());
-//            mLineClick++;
-//        }
-//        else if(mLineClick==1){
-//            pEnd.setX(x);
-//            pEnd.setY(y - centralWidget()->y());
-//            mLineClick++;
-//            this->setCursor(Qt::ArrowCursor);
-//            QPoint pDrawStart = toDrawPoint(pStart);
-//            QPoint pDrawEnd = toDrawPoint(pEnd);
-//            QPen pen;
-//            pen.setWidth(2);
-//            pen.setColor(Qt::red);
-//            lineItem = ui->gViewCompute->scene()->addLine(QLine(pDrawStart,pDrawEnd),pen);
-//            mLineNum++;
-//            pStart = convPoint(pStart);
-//            pEnd = convPoint(pEnd);
-//            if(ui->actionPicture->isChecked())
-//                displayChart();
-//            else if(ui->actionVideo->isChecked())
-//                timerChart->start();
-//        }
-//    }
-//}
 
 void MainWindow::getRectData()
 {
 //    this->setCursor(Qt::CrossCursor);
-////    initGraph3D();
+//    initGraph3D();
 //    mRectClick = 0;
 //    if(mRectNum){
 //        ui->gViewCompute->scene()->removeItem(rectItem);
 //        mRectNum--;
 //    }
-    ui->gViewCamera->setState(MyGraphicsView::S_Begin);
-    ui->gViewCamera->setType(MyGraphicsView::T_Rect);
+    ui->gViewCompute->setState(MyGraphicsView::S_Begin);
+    ui->gViewCompute->setType(MyGraphicsView::T_Rect);
 }
 
 void MainWindow::getLineData()
 {
 //    this->setCursor(Qt::CrossCursor);
-//    initChart();
+
 //    if(mLineClick==-1&&ui->actionVideo->isChecked()){
 //        timerChart = new QTimer;
 //        timerChart->setInterval(500);
@@ -505,15 +453,18 @@ void MainWindow::getLineData()
 //        ui->gViewCompute->scene()->removeItem(lineItem);
 //        mLineNum--;
 //    }
-    ui->gViewCamera->setState(MyGraphicsView::S_Begin);
-    ui->gViewCamera->setType(MyGraphicsView::T_Line);
+    initChart();
+    mLineClick++;//点击折线选择的次数
+    ui->gViewCompute->setState(MyGraphicsView::S_Begin);
+    ui->gViewCompute->setType(MyGraphicsView::T_Line);
 }
 
 void MainWindow::initChart()
 {
+    //二维折线初始化，分第一次画线和非第一次画线，两种情况下的初始化方式不同
     //仅点击显示二维折线图表且第一次选点的时候初始化图表参数
     qDebug() << "mLineClick:" << mLineClick;
-    if(mLineClick==-1){
+    if(!mLineClick){
         chart->setTitle(tr("切片显示"));
         //chart->setAcceptHoverEvents(true);
         ui->gViewLine->setChart(chart);
@@ -553,75 +504,51 @@ void MainWindow::initChart()
     }
 }
 
-void MainWindow::displayChart()
+void MainWindow::onDisplayChart(QPoint beginPos, QPoint nextPos, int type, int state)
 {
-    QPoint p1 = pStart;
-    QPoint p2 = pEnd;
-
-//    QPen  pen;
-//    pen.setStyle(Qt::DotLine);//Qt::SolidLine, Qt::DashLine, Qt::DotLine, Qt::DashDotLine
-//    pen.setWidth(2);
-//    pen.setColor(Qt::red);
-//    series0->setPen(pen); //折线序列的线条设置
-//    QChart *chart = new QChart();
-
-    int deltx = p2.x()-p1.x();
-    int delty = p2.y()-p1.y();
-    qreal z=0;
-    //curAxis=axisX; //当前坐标轴
-    series->clear();
-    if(deltx > delty){
-        axisX->setRange(p1.x(),p2.x());
-        for(int i=p1.x();i<p2.x();i++){
-            //index就是找两点构成的直线在每一行的纵坐标是在哪里
-            int index = (p1.y() + (i-p1.x())*delty/deltx)*outWidth + i;
-            z =phasedata[index];
-            series->append(i,z);
+    if(state == S_End && type == T_Line){
+        QPoint p1 = mapToImage(beginPos);
+        QPoint p2 = mapToImage(nextPos);
+        int deltx = p2.x()-p1.x();
+        int delty = p2.y()-p1.y();
+        qreal z=0;
+        //curAxis=axisX; //当前坐标轴
+        series->clear();
+        if(deltx > delty){
+            axisX->setRange(p1.x(),p2.x());
+            for(int i=p1.x();i<p2.x();i++){
+                //index就是找两点构成的直线在每一行的纵坐标是在哪里
+                int index = (p1.y() + (i-p1.x())*delty/deltx)*outWidth + i;
+                z =phasedata[index];
+                series->append(i,z);
+            }
+        }
+        else{
+            axisX->setRange(p1.y(),p2.y());
+            for(int i=p1.y();i<p2.y();i++){
+                //index就是找两点构成的直线在每一行的纵坐标是在哪里
+                int index = i*outWidth + p1.x() + (i-p1.y())*deltx/delty;
+                z = phasedata[index];
+                series->append(i,z);
+            }
         }
     }
-    else{
-        axisX->setRange(p1.y(),p2.y());
-        for(int i=p1.y();i<p2.y();i++){
-            //index就是找两点构成的直线在每一行的纵坐标是在哪里
-            int index = i*outWidth + p1.x() + (i-p1.y())*deltx/delty;
-            z = phasedata[index];
-            series->append(i,z);
-        }
+    else if(state == S_End && type == T_Rect){
+
     }
 }
 
-QPoint MainWindow::convPoint(QPoint pSrc)
+QPoint MainWindow::mapToImage(QPoint pSrc)
 {
-    int x1 = pSrc.x();
-    int deltx = ui->gViewCompute->x() + ui->gViewCompute->size().width()/2 - x1;
-    //控件的纵坐标不包括菜单栏工具栏等，鼠标点击的纵坐标包括
-    int y1 = pSrc.y();
-    int delty = ui->gViewCompute->y() + ui->gViewCompute->size().height()/2 - y1;
-    int pDestx = outWidth/2 - deltx*outWidth/mSizeChange.width();
-    int pDesty = outHeight/2 - delty*outHeight/mSizeChange.height();
+    int pDestx = pSrc.x() * outWidth / mSizeDefault.width();
+    int pDesty = pSrc.y() * outHeight / mSizeDefault.height();
     if(pDestx<0) pDestx = 0;
     if(pDestx>=outWidth) pDestx =outWidth-1;
     if(pDesty<0) pDesty = 0;
     if(pDesty>=outHeight) pDesty = outHeight-1;
-     qDebug() << "x1:" << pDestx << "--y1:" <<pDesty;
     return QPoint(pDestx,pDesty);
 }
 
-QPoint MainWindow::toDrawPoint(QPoint pSrc)
-{
-    int x1 = pSrc.x();
-    int deltx = x1 - ui->gViewCompute->x();
-    int y1 = pSrc.y();
-    int delty = y1 - ui->gViewCompute->y();
-    //如果有滚动条，加上滚动条的位置
-//    deltx -=ui->gViewCompute->horizontalScrollBar()->value();
-//    delty -=ui->gViewCompute->verticalScrollBar()->value();
-    qDebug() << ui->gViewCompute->horizontalScrollBar()->value() <<"><" <<ui->gViewCompute->verticalScrollBar()->value();
-    //实际上是找在默认放缩尺度时哪一个点变化来的
-    int pDestx = mSizeDefault.width()/2 - (ui->gViewCompute->width()/2 - deltx)*mSizeDefault.width()/mSizeChange.width();
-    int pDesty = mSizeDefault.height()/2 - (ui->gViewCompute->height()/2 - delty)*mSizeDefault.height()/mSizeChange.height();
-    return QPoint(pDestx,pDesty);
-}
 
 void MainWindow::cleanAllDisplay()
 {
@@ -652,72 +579,6 @@ void MainWindow::cleanAllDisplay()
     ui->gViewCompute->setMatrix(matrix,false);
 }
 
-//放缩图片（例如：放大时factor=1.2f，缩小时factor=0.8f）
-void MainWindow::scaleImage(float factor)
-{
-    //累计放缩因子
-    mScaleFactor *= factor;
-    //构造放缩矩阵
-    QMatrix matrix;
-    matrix.scale(mScaleFactor, mScaleFactor);
-    //QGraphicsView执行放缩
-    ui->gViewCompute->setMatrix(matrix);
-    mSizeChange = mSizeChange*factor;
-    qDebug() << "mSize:" << mSizeChange;
-}
-
-void MainWindow::zoomIn()
-{
-    scaleImage(1.2f);
-}
-
-void MainWindow::zoomOut()
-{
-    scaleImage(0.8f);
-}
-
-//bool MainWindow::eventFilter(QObject* watched, QEvent* event)
-//{
-//    //如果信号不是来自于QGraphicsView，返回。
-//    if (watched != ui->gViewCompute)
-//        return false;
-
-//    switch (event->type())
-//    {
-//    //按键事件（操作放缩）
-//    case QEvent::KeyPress:
-//    {
-//        QKeyEvent * kEvent = (QKeyEvent*)event;
-//        //‘+’即键盘中的‘=’，执行放大
-//        if (kEvent->key() == '=')
-//        {
-//            scaleImage(1.2f);
-//        }
-//        //‘-’执行缩小
-//        else if (kEvent->key() == '-')
-//        {
-//            scaleImage(0.8f);
-//        }
-//    }
-//    case QEvent::Wheel:
-//    {
-//        QWheelEvent *wEvent = (QWheelEvent*)event;
-//        if(wEvent->delta() > 0)
-//        {
-//            zoomIn();
-//        }
-//        else
-//        {
-//            zoomOut();
-//        }
-//    }
-
-//    default:
-//        break;
-//    }
-
-//    return QMainWindow::eventFilter(watched, event);
-//}
 
 void MainWindow::getParam()
 {

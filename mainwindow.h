@@ -51,6 +51,25 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public:
+    enum Type {
+        T_None,
+        T_Point,
+        T_Line,
+        T_Circle,
+        T_Ellipse,
+        T_Rect,
+        T_RoundRect,
+        T_Polygon,
+        T_Bezier
+    };
+    enum State {
+        S_None,
+        S_Begin,
+        S_Moving,
+        S_Press,
+        S_End
+    };
 signals:
     void captureFinish();
 
@@ -65,10 +84,10 @@ private slots:
     void getRectData();
     void getLineData();
     void initChart();
-    void displayChart();
+    void onDisplayChart(QPoint beginPos,QPoint nextPos,int type,int state);
     void cleanAllDisplay();
-    void zoomIn();
-    void zoomOut();
+//    void zoomIn();
+//    void zoomOut();
 //    bool eventFilter(QObject* watched, QEvent* event);
     void getParam();
 
@@ -96,7 +115,7 @@ private:
     float m_max,m_min;
     MyGraphicsScene *myHoloScene;
     //相位显示
-//    QGraphicsScene *myPhaseScene;
+    MyGraphicsScene *myPhaseScene;
     //3D图表
 private:
     QWidget *graphContariner;
@@ -116,7 +135,7 @@ private:
     QValueAxis *axisX;
     QValueAxis *axisY;
     QLine mLine;
-    int mLineClick = -1;
+    int mLineClick = 0;//二维折线初始化的控制变量
     int mLineNum = 0;
     int mRectNum = 0;
     QPoint pStart;
@@ -124,9 +143,9 @@ private:
     //放大缩小
     float mScaleFactor = 1.0;
     //画线画框
-    bool mouseIsdown = false;
-    QGraphicsLineItem *lineItem;
-    QGraphicsRectItem *rectItem;
+//    bool mouseIsdown = false;
+//    QGraphicsLineItem *lineItem;
+//    QGraphicsRectItem *rectItem;
     //参数设置
     ParamSet *pSet;
 
@@ -135,9 +154,8 @@ public:
     void initGraph3D();
     void createColorBar(float,float);
     void systemCalibration();
-    QPoint convPoint(QPoint pSrc);//鼠标点击坐标到图像像素索引坐标的转换函数
-    QPoint toDrawPoint(QPoint pSrc);//鼠标点击坐标到画线/画框坐标的转换函数
-    void scaleImage(float factor);
+    QPoint mapToImage(QPoint pSrc);//将场景Scene中的坐标转换到场景中图像的索引坐标
+//    void scaleImage(float factor);
 public:
 //    void mousePressEvent(QMouseEvent *ev);
 
